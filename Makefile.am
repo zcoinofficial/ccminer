@@ -109,6 +109,8 @@ nvcc_ARCH   = -gencode=arch=compute_61,code=\"sm_61,compute_61\"
 nvcc_FLAGS = $(nvcc_ARCH) @CUDA_INCLUDES@ -I. @CUDA_CFLAGS@
 nvcc_FLAGS += $(JANSSON_INCLUDES) -std=c++11 --ptxas-options="-v"
 
+nvcc_FLAGS_no_gcc_opt := $(filter-out -O1 -O2 -O3,$(nvcc_FLAGS))
+
 # we're now targeting all major compute architectures within one binary.
 .cu.o:
 	$(NVCC) $(nvcc_FLAGS) --maxrregcount=128 -o $@ -c $<
@@ -177,3 +179,11 @@ scrypt/titan_kernel.o: scrypt/titan_kernel.cu
 skein.o: skein.cu
 	$(NVCC) $(nvcc_FLAGS) --maxrregcount=64 -o $@ -c $<
 
+# Remove -O{1,2,3}
+#
+# /usr/lib/gcc/x86_64-linux-gnu/6/include/avx512fintrin.h(9218):
+# error: argument of type "const void *" is incompatible with parameter of type "const float *"
+#
+# https://github.com/apache/incubator-mxnet/issues/10558#issuecomment-384899345
+cuda_mtp/mtp.o: cuda_mtp/mtp.cu
+	$(NVCC) $(nvcc_FLAGS_no_gcc_opt) --maxrregcount=128 -o $@ -c $<
