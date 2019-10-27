@@ -28,13 +28,33 @@ Building on Linux (tested on Ubuntu 16.04)
 	* sudo apt-get -y install gcc g++ build-essential automake linux-headers-$(uname -r) git gawk libcurl4-openssl-dev libjansson-dev xorg libc++-dev libgmp-dev python-dev
 
 	* Installing CUDA 10.1 and compatible drivers from nvidia website and not from ubuntu package is usually easier
-	
+
 	* Compiling ccminner:
 
 	./autogen.sh
 	./configure
 	./make
 
+Building on macOS (tested on High Sierra 10.13.6)
+------------------------------------------
+1. [download and install CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit-archive)
+1. install Homebrew
+	```
+	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	```
+1. install dependencies via Homebrew
+	```
+	brew install pkg-config autoconf automake curl openssl llvm cmake`
+	brew install cliutils/apple/libomp
+	```
+1. build
+	```
+	./build.sh
+	```
+1. verify binary built
+	```
+	./ccminer -n
+	```
 
 About source code dependencies for windows
 ------------------------------------------
@@ -73,16 +93,5 @@ ccminer -a mtp -o  http://127.0.0.1:8382  -u djm34 -p password --coinbase-addr a
 zcoin wallet should also be run with "server=1" option and "rpcport,rpcuser,rpcpassword" should match those of zcoin.conf
 
 
-*Instruction for mining on pool: 
-ccminer -a mtp -o stratum+tcp://zcoin.mintpond.com:3000 -u aChWVb8CpgajadpLmiwDZvZaKizQgHxfh5.worker   -p 0,strict,verbose,d=500 -i 20 
-
-
-
-
-
-
-
-
-
-
-
+*Instruction for mining on pool:
+ccminer -a mtp -o stratum+tcp://zcoin.mintpond.com:3000 -u aChWVb8CpgajadpLmiwDZvZaKizQgHxfh5.worker   -p 0,strict,verbose,d=500 -i 20
