@@ -77,7 +77,10 @@ AC_CHECK_LIB([pthread], [pthread_create], PTHREAD_LIBS="-lpthread",
 ))))
 
 AC_CHECK_LIB([z],[gzopen], [], [])
-AC_CHECK_LIB([ssl],[SSL_free], [], [AC_MSG_ERROR([OpenSSL library required])])
+if test x$have_osx = xfalse
+then
+  AC_CHECK_LIB([ssl],[SSL_library_init], [], [AC_MSG_ERROR([OpenSSL library required])])
+fi
 AC_CHECK_LIB([crypto],[EVP_DigestFinal_ex], [], [AC_MSG_ERROR([OpenSSL library required])])
 
 AM_CONDITIONAL([WANT_JANSSON], [test x$request_jansson = xtrue])
@@ -90,12 +93,19 @@ if test x$request_jansson = xtrue
 then
 	JANSSON_LIBS="compat/bos-jansson/libbosjansson.a"
 else
-	JANSSON_LIBS=-lbosjansson 
+	JANSSON_LIBS=-lbosjansson
 # "compat/bos-jansson/libbosjansson.a"
 fi
 
-LIBCURL_CHECK_CONFIG(, 7.15.2, ,
-  [AC_MSG_ERROR([Missing required libcurl >= 7.15.2])])
+#LIBCURL_CHECK_CONFIG(, 7.15.2, ,
+#  [AC_MSG_ERROR([Missing required libcurl >= 7.15.2])])
+LIBCURL=-lcurl
+if test x$have_osx = xtrue
+then
+  LIBCURL_CPPFLAGS=-I/usr/local/opt/curl/include
+fi
+AC_SUBST(LIBCURL)
+AC_SUBST(LIBCURL_CPPFLAGS)
 
 AC_SUBST(JANSSON_LIBS)
 AC_SUBST(PTHREAD_FLAGS)
@@ -159,6 +169,6 @@ AC_SUBST(CUDA_LIBS)
 AC_SUBST(CUDA_LDFLAGS)
 AC_SUBST(NVCC)
 
-AC_SUBST(OPENMP_CFLAGS) 
+AC_SUBST(OPENMP_CFLAGS)
 
 AC_OUTPUT

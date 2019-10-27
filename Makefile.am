@@ -16,7 +16,7 @@ SUBDIRS = compat
 bin_PROGRAMS = ccminer
 
 ccminer_SOURCES	= elist.h miner.h compat.h \
-			  base58.cpp \	
+			  base58.cpp \
 			  compat/bignum_ssl10.hpp \
 			  compat/inttypes.h compat/stdbool.h compat/unistd.h \
 			  compat/sys/time.h compat/getopt/getopt.h \
@@ -26,11 +26,11 @@ ccminer_SOURCES	= elist.h miner.h compat.h \
 			  merkletree/merkle-tree.cpp 	merkletree/merkle-tree.hpp \
 			  merkletree/mtp.h 	  merkletree/mtp.cpp \
 			  merkletree/serialize.h \
-			  argon2ref/argon2.c  argon2ref/blake2ba.c  argon2ref/blake2-impl.h \      
-			  argon2ref/blamka-round-ref.h  argon2ref/core.h  \    
+			  argon2ref/argon2.c  argon2ref/blake2ba.c  argon2ref/blake2-impl.h \
+			  argon2ref/blamka-round-ref.h  argon2ref/core.h  \
 			  argon2ref/encoding.h  argon2ref/thread.c  \
 			  argon2ref/argon2.h  argon2ref/blake2.h    \
-			  argon2ref/blamka-round-opt.h  argon2ref/core.c   \           
+			  argon2ref/blamka-round-opt.h  argon2ref/core.c   \
 			  argon2ref/encoding.c  argon2ref/ref.c   argon2ref/thread.h \
 			  argon2ref/blake2b-load-sse2.h argon2ref/blake2b-load-sse41.h \
 			  argon2ref/blake2b-round.h argon2re/blake2-impl.h \
@@ -102,6 +102,13 @@ ccminer_LDFLAGS  = $(PTHREAD_FLAGS) @CUDA_LDFLAGS@
 ccminer_LDADD    = @LIBCURL@ @JANSSON_LIBS@ @PTHREAD_LIBS@ @WS2_LIBS@ @CUDA_LIBS@ @OPENMP_CFLAGS@ @LIBS@ $(nvml_libs)
 ccminer_CPPFLAGS = @LIBCURL_CPPFLAGS@ @OPENMP_CFLAGS@ $(CPPFLAGS) $(PTHREAD_FLAGS) -fno-strict-aliasing -std=c++11 $(JANSSON_INCLUDES) $(DEF_INCLUDES) $(nvml_defs)
 
+if HAVE_OSX
+ccminer_LDFLAGS += -L/usr/local/opt/llvm/lib
+ccminer_LDADD += -lcurl -lcrypto -lomp
+ccminer_CPPFLAGS += -I/usr/local/opt/openssl/include -I/usr/local/llvm/lib/clang/4.0.0/include
+endif
+
+nvcc_ARCH  = -gencode=arch=compute_50,code=\"sm_50,compute_50\"
 
 nvcc_ARCH   = -gencode=arch=compute_61,code=\"sm_61,compute_61\"
 nvcc_ARCH += -gencode=arch=compute_52,code=\"sm_52,compute_52\"
@@ -110,6 +117,10 @@ nvcc_ARCH += -gencode=arch=compute_75,code=\"sm_75,compute_75\"
 
 nvcc_FLAGS = $(nvcc_ARCH) @CUDA_INCLUDES@ -I. @CUDA_CFLAGS@
 nvcc_FLAGS += $(JANSSON_INCLUDES) -std=c++11 --ptxas-options="-v"
+
+if HAVE_OSX
+nvcc_FLAGS += -I/usr/local/opt/openssl/include
+endif
 
 # we're now targeting all major compute architectures within one binary.
 .cu.o:
@@ -178,4 +189,3 @@ scrypt/titan_kernel.o: scrypt/titan_kernel.cu
 
 skein.o: skein.cu
 	$(NVCC) $(nvcc_FLAGS) --maxrregcount=64 -o $@ -c $<
-
