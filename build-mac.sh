@@ -1,5 +1,7 @@
 #!/bin/bash
 
+THREADS=$THREADS || sysctl -n hw.ncpu
+
 # Simple script to create the Makefile and build
 
 # export PATH="$PATH:/usr/local/cuda/bin/"
@@ -13,7 +15,7 @@ rm -f config.status
 # CFLAGS="-O2" ./configure
 ./configure.sh
 
-make -j 4
+make -j$THREADS
 
 if [ "$(uname)" == "Darwin" ]; then
 install_name_tool -change $(otool -L ./ccminer | grep -o ".*/libomp\.dylib") @executable_path/libomp.dylib ./ccminer
