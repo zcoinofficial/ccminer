@@ -105,7 +105,7 @@ ccminer_CPPFLAGS = @LIBCURL_CPPFLAGS@ @OPENMP_CFLAGS@ $(CPPFLAGS) $(PTHREAD_FLAG
 if HAVE_OSX
 ccminer_LDFLAGS += -L/usr/local/opt/llvm/lib
 ccminer_LDADD += -lcurl -lcrypto -lomp
-ccminer_CPPFLAGS += -I/usr/local/opt/openssl/include -I/usr/local/llvm/lib/clang/4.0.0/include
+ccminer_CPPFLAGS += -I/usr/local/opt/openssl/include -I/usr/local/llvm/lib/clang/4.0.0/include --stdlib=libc++
 else
 ccminer_CPPFLAGS += -std=c++11
 endif
@@ -121,7 +121,7 @@ nvcc_FLAGS = $(nvcc_ARCH) @CUDA_INCLUDES@ -I. @CUDA_CFLAGS@
 nvcc_FLAGS += $(JANSSON_INCLUDES) --ptxas-options="-v"
 
 if HAVE_OSX
-nvcc_FLAGS += -I/usr/local/opt/openssl/include
+nvcc_FLAGS += -I/usr/local/opt/openssl/include --stdlib=libc++
 else
 nvcc_FLAGS += -std=c++11
 endif
