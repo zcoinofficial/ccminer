@@ -33,7 +33,7 @@ Building on Linux (tested on Ubuntu 16.04)
 
 	./autogen.sh
 	./configure
-	./make
+	make
 
 
 About source code dependencies for windows
